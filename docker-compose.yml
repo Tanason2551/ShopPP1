@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shoppp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/shoppp
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  pos:
+    build:
+      context: ./pos
+      dockerfile: Dockerfile
+    env_file:
+      - ./pos/.env
+    environment:
+      - VITE_API_URL=http://192.168.20.231:5000/api
+      - VITE_SOCKET_URL=http://192.168.20.231:5000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./pos:/app
+      - /app/node_modules
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    env_file:
+      - ./web/.env
+    environment:
+      - NEXT_PUBLIC_API_URL=http://192.168.20.231:5000/api
+      - NEXT_PUBLIC_SOCKET_URL=http://192.168.20.231:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

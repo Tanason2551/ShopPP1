@@ -1,0 +1,136 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      Role     @default(STAFF)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+  stockLogs    StockLog[]
+  restockBills RestockBill[]
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id                  String   @id @default(uuid())
+  name                String
+  barcode             String?  @unique
+  price               Float
+  costPrice           Float?
+  stockQty            Int      @default(0)
+  lowStockThreshold   Int      @default(5)
+  isShortcut          Boolean  @default(false)
+  image               String?
+  categoryId          String?
+  category            Category? @relation(fields: [categoryId], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  transactionItems TransactionItem[]
+  stockLogs        StockLog[]
+  restockItems     RestockItem[]
+}
+
+enum PaymentMethod {
+  CASH
+  PROMPTPAY
+  CARD
+}
+
+enum TransactionStatus {
+  COMPLETED
+  CANCELLED
+}
+
+model Transaction {
+  id             String            @id @default(uuid())
+  totalAmount    Float
+  receivedAmount Float             @default(0)
+  changeAmount   Float             @default(0)
+  paymentMethod  PaymentMethod     @default(CASH)
+  status         TransactionStatus @default(COMPLETED)
+  userId         String
+  user           User              @relation(fields: [userId], references: [id])
+  createdAt      DateTime          @default(now())
+
+  items TransactionItem[]
+}
+
+model TransactionItem {
+  id            String      @id @default(uuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  quantity      Int
+  price         Float
+}
+
+enum StockLogType {
+  IN
+  OUT
+  ADJUST
+}
+
+model StockLog {
+  id        String       @id @default(uuid())
+  productId String
+  product   Product      @relation(fields: [productId], references: [id])
+  changeQty Int
+  type      StockLogType
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  createdAt DateTime     @default(now())
+  note      String?
+}
+
+model RestockBill {
+  id          String   @id @default(uuid())
+  totalCost   Float
+  note        String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  
+  items       RestockItem[]
+}
+
+model RestockItem {
+  id            String      @id @default(uuid())
+  restockBillId String
+  restockBill   RestockBill @relation(fields: [restockBillId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  quantity      Int
+  costPrice     Float
+}
+
+model ShopConfig {
+  id        Int      @id @default(1)
+  name      String   @default("Shop PP")
+  address   String?  @default("123 Market Street, City Center")
+  phone     String?  @default("02-xxx-xxxx")
+  logo      String?
+  updatedAt DateTime @updatedAt
+}

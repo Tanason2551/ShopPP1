@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Transaction" ADD COLUMN     "changeAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "receivedAmount" DOUBLE PRECISION NOT NULL DEFAULT 0;

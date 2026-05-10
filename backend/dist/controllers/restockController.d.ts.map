@@ -1,0 +1,1 @@
+{"version":3,"file":"restockController.d.ts","sourceRoot":"","sources":["../../src/controllers/restockController.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAE5C,OAAO,EAAE,WAAW,EAAE,MAAM,+BAA+B,CAAC;AAE5D,eAAO,MAAM,iBAAiB,GAAU,KAAK,WAAW,EAAE,KAAK,QAAQ,4DAiEtE,CAAC;AAEF,eAAO,MAAM,eAAe,GAAU,KAAK,OAAO,EAAE,KAAK,QAAQ,kBAehE,CAAC"}
